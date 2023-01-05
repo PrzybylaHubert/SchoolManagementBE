@@ -6,6 +6,7 @@ use App\Repository\ResetPasswordRequestRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ResetPasswordRequestRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class ResetPasswordRequest
 {
     #[ORM\Id]
@@ -13,7 +14,7 @@ class ResetPasswordRequest
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\OneToOne(inversedBy: 'resetPasswordRequest', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(inversedBy: 'resetPasswordRequest')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user_id = null;
 
@@ -28,6 +29,13 @@ class ResetPasswordRequest
 
     #[ORM\Column]
     private ?\DateTimeImmutable $expires_at = null;
+
+    #[ORM\PrePersist]
+    public function setCreatedAtValue(): void
+    {
+        $this->requested_at = new \DateTimeImmutable();
+        $this->expires_at = $this->requested_at->add(new \DateInterval('PT1H'));
+    }
 
     public function getId(): ?int
     {

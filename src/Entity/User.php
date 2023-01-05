@@ -48,11 +48,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?bool $first_login = null;
 
-    #[ORM\OneToOne(mappedBy: 'user_id', cascade: ['persist', 'remove'])]
-    private ?ResetPasswordRequest $resetPasswordRequest = null;
+    #[ORM\OneToMany(mappedBy: 'user_id', targetEntity: ResetPasswordRequest::class, cascade: ['persist', 'remove'])]
+    private Collection $resetPasswordRequest;
 
     public function __construct()
     {
+        $this->resetPasswordRequest = new ArrayCollection();
         $this->receivedMessages = new ArrayCollection();
         $this->sendMessages = new ArrayCollection();
     }
@@ -235,19 +236,32 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getResetPasswordRequest(): ?ResetPasswordRequest
+    /**
+    * @return Collection<int, Message>
+    */
+    public function getResetPasswordRequest(): Collection
     {
         return $this->resetPasswordRequest;
     }
 
-    public function setResetPasswordRequest(ResetPasswordRequest $resetPasswordRequest): self
+    public function addResetPasswordRequest(ResetPasswordRequest $resetPasswordRequest): self
     {
-        // set the owning side of the relation if necessary
-        if ($resetPasswordRequest->getUserId() !== $this) {
+        if (!$this->resetPasswordRequest->contains($resetPasswordRequest)) {
+            $this->resetPasswordRequest->add($resetPasswordRequest);
             $resetPasswordRequest->setUserId($this);
         }
 
-        $this->resetPasswordRequest = $resetPasswordRequest;
+        return $this;
+    }
+
+    public function removeResetPasswordRequest(ResetPasswordRequest $resetPasswordRequest): self
+    {
+        if ($this->resetPasswordRequest->removeElement($resetPasswordRequest)) {
+            // set the owning side to null (unless already changed)
+            if ($resetPasswordRequest->getUserId() === $this) {
+                $resetPasswordRequest->setUserId(null);
+            }
+        }
 
         return $this;
     }
