@@ -21,22 +21,20 @@ class ResetPasswordRequestRepository extends ServiceEntityRepository
         parent::__construct($registry, ResetPasswordRequest::class);
     }
 
-    public function save(ResetPasswordRequest $entity, bool $flush = false): void
+    public function save(ResetPasswordRequest $entity): void
     {
-        $this->getEntityManager()->persist($entity);
+        $entityManager = $this->getEntityManager();
 
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
+        $entityManager->persist($entity);
+        $entityManager->flush();
     }
 
-    public function remove(ResetPasswordRequest $entity, bool $flush = false): void
+    public function remove(ResetPasswordRequest $entity): void
     {
-        $this->getEntityManager()->remove($entity);
+        $entityManager = $this->getEntityManager();
 
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
+        $entityManager->remove($entity);
+        $entityManager->flush();
     }
 
 //    /**

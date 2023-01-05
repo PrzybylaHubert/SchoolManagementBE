@@ -2,7 +2,11 @@
 
 namespace App\Service;
 
+use App\Entity\User;
+use App\Utility\ErrorList;
 use App\Repository\UserRepository;
+use App\Entity\ResetPasswordRequest;
+use App\Repository\ResetPasswordRequestRepository;
 use App\Utils\FormModel\ResetPasswordRequestValidate;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -11,11 +15,16 @@ class ResetPasswordService extends JsonService
 {
     private ValidatorInterface $validator;
     private UserRepository $userRepository;
+    private ResetPasswordRequestRepository $resetPasswordRequestRepository;
 
-    public function __construct(ValidatorInterface $validator, UserRepository $userRepository)
-    {
+    public function __construct(
+        ValidatorInterface $validator, 
+        UserRepository $userRepository,
+        ResetPasswordRequestRepository $resetPasswordRequestRepository
+    ) {
         $this->validator = $validator;
         $this->userRepository = $userRepository;
+        $this->resetPasswordRequestRepository = $resetPasswordRequestRepository;
     }
     
     public function validateParameters(ResetPasswordRequestValidate $object): void
@@ -26,10 +35,26 @@ class ResetPasswordService extends JsonService
         }
     }
 
-    public function checkUser($email)
+    public function checkUser(string $email): User
     {
         if(!$user = $this->userRepository->findOneBy(['email' => $email])) {
-            throw new BadRequestHttpException("user not found");
+            throw new BadRequestHttpException(ErrorList::USER_NOT_FOUND);
         }
+
+        if($reset = $user->getResetPasswordRequest()) {
+            $this->resetPasswordRequestRepository->remove($reset[0]);
+        }
+
+        return $user;
+    }
+
+    public function createRequest(User $user, string $selector, string $token)
+    {
+        $resetPasswordRequest = new ResetPasswordRequest();
+        $resetPasswordRequest->setUserId($user);
+        $resetPasswordRequest->setSelector($selector);
+        $resetPasswordRequest->setHashedToken(hash('sha384', $token));
+
+        $this->resetPasswordRequestRepository->save($resetPasswordRequest);
     }
 }

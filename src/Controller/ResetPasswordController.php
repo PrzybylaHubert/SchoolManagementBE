@@ -23,7 +23,11 @@ class ResetPasswordController extends AbstractController
         $form->submit($parameters);
 
         $resetPasswordService->validateParameters($resetRequestValidate);
-        $resetPasswordService->checkUser($parameters['email']);
+        $user = $resetPasswordService->checkUser($parameters['email']);
+
+        $selector =  bin2hex(random_bytes(8));
+        $token = random_bytes(32);
+        $resetPasswordService->createRequest($user, $selector, $token);
 
         return $this->json([
             'request' => "test"
