@@ -48,8 +48,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?bool $first_login = null;
 
+    #[ORM\OneToMany(mappedBy: 'user_id', targetEntity: ResetPasswordRequest::class, cascade: ['persist', 'remove'])]
+    private Collection $resetPasswordRequest;
+
     public function __construct()
     {
+        $this->resetPasswordRequest = new ArrayCollection();
         $this->receivedMessages = new ArrayCollection();
         $this->sendMessages = new ArrayCollection();
     }
@@ -228,6 +232,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setFirstLogin(bool $first_login): self
     {
         $this->first_login = $first_login;
+
+        return $this;
+    }
+
+    /**
+    * @return Collection<int, Message>
+    */
+    public function getResetPasswordRequest(): Collection
+    {
+        return $this->resetPasswordRequest;
+    }
+
+    public function addResetPasswordRequest(ResetPasswordRequest $resetPasswordRequest): self
+    {
+        if (!$this->resetPasswordRequest->contains($resetPasswordRequest)) {
+            $this->resetPasswordRequest->add($resetPasswordRequest);
+            $resetPasswordRequest->setUserId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeResetPasswordRequest(ResetPasswordRequest $resetPasswordRequest): self
+    {
+        if ($this->resetPasswordRequest->removeElement($resetPasswordRequest)) {
+            // set the owning side to null (unless already changed)
+            if ($resetPasswordRequest->getUserId() === $this) {
+                $resetPasswordRequest->setUserId(null);
+            }
+        }
 
         return $this;
     }
