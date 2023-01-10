@@ -101,4 +101,10 @@ class ResetPasswordRequest
 
         return $this;
     }
+
+    public function isExpired(): bool
+    {
+        $currentTime = new \DateTimeImmutable();
+        return $currentTime > $this->getExpiresAt();
+    }
 }
