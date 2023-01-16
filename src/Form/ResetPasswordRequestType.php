@@ -3,7 +3,7 @@
 namespace App\Form;
 
 use Symfony\Component\Form\AbstractType;
-use App\Utils\FormModel\ResetPasswordRequestValidate;
+use App\Utility\FormModel\ResetPasswordRequestValidate;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
