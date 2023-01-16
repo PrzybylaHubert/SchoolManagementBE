@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Utils\FormModel;
+namespace App\Utility\FormModel;
 
 use App\Utility\ErrorList;
 use Symfony\Component\Validator\Constraints as Assert;

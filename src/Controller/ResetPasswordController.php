@@ -10,8 +10,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use App\Utils\FormModel\ResetPasswordExecuteValidate;
-use App\Utils\FormModel\ResetPasswordRequestValidate;
+use App\Utility\FormModel\ResetPasswordExecuteValidate;
+use App\Utility\FormModel\ResetPasswordRequestValidate;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -45,7 +45,7 @@ class ResetPasswordController extends AbstractController
         $mailer->send($email);
 
         return $this->json([
-            'request' => $link
+            'status' => 'success'
         ]);
     }
 
