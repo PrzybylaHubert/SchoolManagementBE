@@ -31,7 +31,7 @@ class ResetPasswordService extends JsonService
     {
         $errors = $this->validator->validate($object);
         if (count($errors) > 0) {
-            throw new BadRequestHttpException($errors[0]);
+            throw new BadRequestHttpException($errors[0]->getMessage());
         }
     }
 
